@@ -1,0 +1,49 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int const kINF = 1e9;
+int main() {
+
+	int N, s, t;
+	cin >> N >> s >> t;
+	s--, t--;
+	vector<vector<int>> matrix(N, vector<int>(N, -1));
+
+	for (int i = 0; i < N; ++i) {
+		for (int j = 0; j < N; ++j) {
+			cin >> matrix[i][j];
+		}
+	}
+
+
+	vector<vector<int>> dist(N, vector<int>(N, kINF));
+	for (int i = 0; i < N; ++i) {
+		for (int j = 0; j < N; ++j) {
+			if (matrix[i][j] != -1) {
+				dist[i][j] = matrix[i][j];
+			}
+		}
+		dist[i][i] = 0;
+	}
+
+	for (int k = 0; k < N; ++k) {
+		for (int i = 0; i < N; ++i) {
+			if (dist[i][k] == kINF) continue;
+			for (int j = 0; j < N; ++j) {
+				if (dist[k][j] == kINF) continue;
+				if (dist[i][k] + dist[k][j] < dist[i][j]) {
+					dist[i][j] = dist[i][k] + dist[k][j];
+				}
+			}
+		}
+	}
+	if (dist[s][t] >= kINF) {
+		cout << -1 << endl;
+	}
+	else {
+		cout << dist[s][t] << endl;
+	}
+	return 0;
+}
