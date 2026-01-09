@@ -1,0 +1,48 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+const long long INF = 1e18;
+
+struct Edge {
+    int begin, end;
+    long long weight;
+};
+
+int main() {
+    int N, M;
+    cin >> N >> M;
+
+    vector<Edge> edges(M);
+    for (int i = 0; i < M; ++i) {
+        int b, e;
+        long long w;
+        cin >> b >> e >> w;
+        edges[i] = { b - 1, e - 1, w };
+    }
+
+    vector<long long> dist(N, INF);
+    dist[0] = 0; 
+
+    for (int i = 0; i < N - 1; ++i) {
+        for (const Edge& edge : edges) {
+            if (dist[edge.begin] != INF &&
+                dist[edge.begin] + edge.weight < dist[edge.end]) {
+                dist[edge.end] = dist[edge.begin] + edge.weight;
+            }
+        }
+    }
+
+
+    for (int i = 0; i < N; ++i) {
+        if (dist[i] == INF) {
+            cout << "No ";
+        }
+        else {
+            cout << dist[i] << " ";
+        }
+    }
+
+    return 0;
+}
