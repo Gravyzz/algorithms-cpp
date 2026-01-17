@@ -1,0 +1,101 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+const long long kINF = 1e18;
+
+
+vector<vector<long long>> readMatrix(int n) {
+    vector<vector<long long>> matrix(n, vector<long long>(n));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> matrix[i][j];
+        }
+    }
+    return matrix;
+}
+
+
+long long prim(
+    const vector<vector<long long>>& matrix,
+    vector<int>& parent,
+    vector<long long>& minEdge
+) {
+    int n = matrix.size();
+    vector<bool> used(n, false);
+
+    minEdge.assign(n, kINF);
+    parent.assign(n, -1);
+
+    minEdge[0] = 0;
+    long long total = 0;
+
+    for (int i = 0; i < n; i++) {
+        int v = -1;
+        for (int j = 0; j < n; j++) {
+            if (!used[j] && (v == -1 || minEdge[j] < minEdge[v])) {
+                v = j;
+            }
+        }
+
+        used[v] = true;
+        total += minEdge[v];
+
+        for (int to = 0; to < n; to++) {
+            if (!used[to] && matrix[v][to] != 0 && matrix[v][to] < minEdge[to]) {
+                minEdge[to] = matrix[v][to];
+                parent[to] = v;
+            }
+        }
+    }
+
+    return total;
+}
+
+
+vector<vector<long long>> buildMatrix(
+    int n,
+    const vector<int>& parent,
+    const vector<long long>& minEdge
+) {
+    vector<vector<long long>> mst(n, vector<long long>(n, 0));
+
+    for (int v = 1; v < n; v++) {
+        int u = parent[v];
+        mst[u][v] = mst[v][u] = minEdge[v];
+    }
+
+    return mst;
+}
+
+
+void printMatrix(const vector<vector<long long>>& matrix) {
+    int n = matrix.size();
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << matrix[i][j] << " ";
+        }
+        cout << "\n";
+    }
+}
+
+
+int main() {
+    int n;
+    cin >> n;
+
+    vector<vector<long long>> matrix = readMatrix(n);
+
+    vector<int> parent;
+    vector<long long> minEdge;
+
+    long long total = prim(matrix, parent, minEdge);
+
+    cout << total << "\n";
+
+    vector<vector<long long>> mst = buildMatrix(n, parent, minEdge);
+    printMatrix(mst);
+
+    return 0;
+}
