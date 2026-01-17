@@ -1,0 +1,100 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+
+struct Edge {
+    int u, v;
+    int w;
+};
+
+
+int findSet(int v, vector<int>& parent) {
+    if (v == parent[v])
+        return v;
+    return parent[v] = findSet(parent[v], parent);
+}
+
+
+void unionSets(int a, int b, vector<int>& parent) {
+    a = findSet(a, parent);
+    b = findSet(b, parent);
+    if (a != b)
+        parent[b] = a;
+}
+
+
+vector<Edge> readEdges(int m) {
+    vector<Edge> edges;
+    for (int i = 0; i < m; i++) {
+        int u, v, w;
+        cin >> u >> v >> w;
+        edges.push_back({ u - 1, v - 1, w });
+    }
+    return edges;
+}
+
+
+long long buildMST(
+    int n,
+    vector<Edge>& edges,
+    vector<vector<int>>& mstMatrix
+) {
+    sort(edges.begin(), edges.end(),
+        [](Edge a, Edge b) {
+            return a.w < b.w;
+        });
+
+    vector<int> parent(n);
+    for (int i = 0; i < n; i++)
+        parent[i] = i;
+
+    long long totalWeight = 0;
+    int usedEdges = 0;
+
+    for (Edge e : edges) {
+        if (findSet(e.u, parent) != findSet(e.v, parent)) {
+            unionSets(e.u, e.v, parent);
+
+            mstMatrix[e.u][e.v] = e.w;
+            mstMatrix[e.v][e.u] = e.w;
+
+            totalWeight += e.w;
+            usedEdges++;
+
+            if (usedEdges == n - 1)
+                break;
+        }
+    }
+
+    return totalWeight;
+}
+
+
+void printMatrix(const vector<vector<int>>& matrix) {
+    for (int i = 0; i < matrix.size(); i++) {
+        for (int j = 0; j < matrix.size(); j++) {
+            cout << matrix[i][j] << " ";
+        }
+        cout << "\n";
+    }
+}
+
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    vector<Edge> edges = readEdges(m);
+
+    vector<vector<int>> mstMatrix(n, vector<int>(n, 0));
+
+    long long answer = buildMST(n, edges, mstMatrix);
+
+    cout << answer << "\n";
+    printMatrix(mstMatrix);
+
+    return 0;
+}
